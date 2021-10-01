@@ -88,3 +88,34 @@ class APITest(FullTestCase):
         )
         response = self.client.post(url)
         self.assertEqual(response.status_code, self.status_code.HTTP_200_OK)
+
+    def test_users_list(self):
+        self.client.force_authenticate(self.admin_user)
+        url = self.reverse(
+            "organization-users",
+            kwargs={"version": "v1", "pk": self.organization_member_request.pk},
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, self.status_code.HTTP_200_OK)
+
+    def test_users_add(self):
+        self.client.force_authenticate(self.admin_user)
+        url = self.reverse(
+            "organization-add-users",
+            kwargs={"version": "v1", "pk": self.organization_member_request.pk},
+        )
+        user = self.baker.make(settings.AUTH_USER_MODEL, is_active=True)
+        data = {"user": user.username, "role": "member"}
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, self.status_code.HTTP_200_OK)
+
+    def test_users_remove(self):
+        self.client.force_authenticate(self.admin_user)
+        url = self.reverse(
+            "organization-remove-users",
+            kwargs={"version": "v1", "pk": self.organization_member_request.pk},
+        )
+        user = self.baker.make(settings.AUTH_USER_MODEL, is_active=True)
+        data = {"user": user.username, "role": "member"}
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, self.status_code.HTTP_200_OK)

@@ -151,8 +151,8 @@ class APITest(FullTestCase):
             kwargs={"version": "v1", "pk": self.project.pk},
         )
         multiple_data = [
-            {"user": first_user.pk, "permission": "write"},
-            {"user": second_user.pk},
+            {"user": first_user.username, "permission": "write"},
+            {"user": second_user.username},
         ]
         multiple_post_response = self.client.post(
             url, data=multiple_data, format="json"
@@ -169,7 +169,7 @@ class APITest(FullTestCase):
             "read_only",
         )
 
-        single_data = {"user": second_user.pk, "permission": "write"}
+        single_data = {"user": second_user.username, "permission": "write"}
         single_post_response = self.client.post(url, data=single_data)
         self.assertEqual(single_post_response.status_code, self.status_code.HTTP_200_OK)
         self.assertEqual(
@@ -191,8 +191,8 @@ class APITest(FullTestCase):
             kwargs={"version": "v1", "pk": self.project.pk},
         )
         multiple_data = [
-            {"user": first_user.pk},
-            {"user": second_user.pk},
+            {"user": first_user.username},
+            {"user": second_user.username},
         ]
         multiple_post_response = self.client.post(
             url, data=multiple_data, format="json"
@@ -201,7 +201,7 @@ class APITest(FullTestCase):
             multiple_post_response.status_code, self.status_code.HTTP_200_OK
         )
 
-        single_data = {"user": third_user.pk}
+        single_data = {"user": third_user.username}
         single_post_response = self.client.post(url, data=single_data)
         self.assertEqual(single_post_response.status_code, self.status_code.HTTP_200_OK)
 

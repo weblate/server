@@ -1,21 +1,20 @@
 from rest_framework import serializers
 
+from neatplus.serializers import UserModelSerializer
+
 from .models import Organization, OrganizationMemberRequest
 
 
-class OrganizationSerializer(serializers.ModelSerializer):
+class OrganizationSerializer(UserModelSerializer):
     class Meta:
         model = Organization
-        fields = "__all__"
+        exclude = (
+            "admins",
+            "members",
+        )
 
 
-class CreateOrganizationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Organization
-        exclude = ("admins", "members")
-
-
-class OrganizationMemberRequestSerializer(serializers.ModelSerializer):
+class OrganizationMemberRequestSerializer(UserModelSerializer):
     is_organization_admin = serializers.SerializerMethodField()
 
     class Meta:
@@ -24,3 +23,8 @@ class OrganizationMemberRequestSerializer(serializers.ModelSerializer):
 
     def get_is_organization_admin(self, obj):
         return self.context["request"].user in obj.organization.admins.all()
+
+
+class OrganizationUserSerializer(serializers.Serializer):
+    user = serializers.CharField()
+    role = serializers.ChoiceField(choices=["admin", "member"])

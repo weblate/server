@@ -4,7 +4,7 @@ from rest_framework import serializers
 from rest_framework.fields import ImageField
 from rest_framework_gis.fields import GeometryField
 
-from neatplus.serializers import RichTextUploadingModelSerializer
+from neatplus.serializers import RichTextUploadingModelSerializer, UserModelSerializer
 from summary.serializers import SurveyResultSerializer, WritableSurveyResultSerializer
 
 from .models import (
@@ -17,7 +17,7 @@ from .models import (
 )
 
 
-class QuestionGroupSerializer(serializers.ModelSerializer):
+class QuestionGroupSerializer(UserModelSerializer):
     class Meta:
         model = QuestionGroup
         fields = "__all__"
@@ -29,13 +29,13 @@ class QuestionSerializer(RichTextUploadingModelSerializer):
         fields = "__all__"
 
 
-class OptionSerializer(serializers.ModelSerializer):
+class OptionSerializer(UserModelSerializer):
     class Meta:
         model = Option
         fields = "__all__"
 
 
-class SurveySerializer(serializers.ModelSerializer):
+class SurveySerializer(UserModelSerializer):
     class Meta:
         model = Survey
         fields = "__all__"
@@ -45,7 +45,7 @@ class ImageListField(serializers.ListField):
     child = serializers.ImageField()
 
 
-class SurveyAnswerSerializer(serializers.ModelSerializer):
+class SurveyAnswerSerializer(UserModelSerializer):
     formatted_answer = serializers.SerializerMethodField()
 
     answer_type_serializer_mapping = {

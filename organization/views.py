@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.db.models import Q
 from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import mixins, permissions, serializers, status, viewsets
@@ -7,20 +9,26 @@ from rest_framework.response import Response
 from neatplus.views import UserStampedModelViewSetMixin
 from project.models import Project
 from project.serializers import CreateProjectSerializer
+from user.models import User
 
 from .filters import OrganizationFilter, OrganizationMemberRequestFilter
 from .models import Organization, OrganizationMemberRequest
-from .permissions import IsMemberRequestOrganizationAdmin, IsOrganizationAdminOrReadOnly
+from .permissions import (
+    IsMemberRequestOrganizationAdmin,
+    IsOrganizationAdmin,
+    IsOrganizationAdminOrReadOnly,
+)
 from .serializers import (
-    CreateOrganizationSerializer,
     OrganizationMemberRequestSerializer,
     OrganizationSerializer,
+    OrganizationUserSerializer,
 )
 
 
 class OrganizationViewSet(UserStampedModelViewSetMixin, viewsets.ModelViewSet):
     filterset_class = OrganizationFilter
     permission_classes = [IsOrganizationAdminOrReadOnly]
+    serializer_class = OrganizationSerializer
 
     def get_queryset(self):
         authenticated_user = self.request.user
@@ -29,13 +37,6 @@ class OrganizationViewSet(UserStampedModelViewSetMixin, viewsets.ModelViewSet):
         else:
             filter_statement = Q(status="accepted")
         return Organization.objects.filter(filter_statement)
-
-    def get_serializer_class(self):
-        if self.name and self.serializer_class:
-            return self.serializer_class
-        if self.action == "create":
-            return CreateOrganizationSerializer
-        return OrganizationSerializer
 
     @extend_schema(
         responses=inline_serializer(
@@ -91,6 +92,106 @@ class OrganizationViewSet(UserStampedModelViewSetMixin, viewsets.ModelViewSet):
             {"detail": "Successfully requested member access"},
             status=status.HTTP_200_OK,
         )
+
+    @action(
+        methods=["get"],
+        detail=True,
+        permission_classes=[IsOrganizationAdmin],
+        serializer_class=OrganizationUserSerializer,
+    )
+    def users(self, request, *args, **kwargs):
+        organization = self.get_object()
+        users = []
+        admins = organization.admins.values_list("username", flat=True)
+        for admin in admins:
+            users.append({"user": admin, "role": "admin"})
+        members = organization.members.values_list("username", flat=True)
+        for member in members:
+            users.append({"user": member, "role": "member"})
+        serializer = self.get_serializer(data=users, many=True)
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        return Response(serializer.data)
+
+    @extend_schema(
+        responses=inline_serializer(
+            name="OrganizationAddUserSerializer",
+            fields={
+                "detail": serializers.CharField(
+                    default="Successfully added all valid users"
+                )
+            },
+        )
+    )
+    @action(
+        methods=["post"],
+        detail=True,
+        permission_classes=[IsOrganizationAdmin],
+        serializer_class=OrganizationUserSerializer,
+    )
+    def add_users(self, request, *args, **kwargs):
+        organization = self.get_object()
+        data = request.data
+        if isinstance(data, dict):
+            serializer = self.get_serializer(data=data)
+        else:
+            serializer = self.get_serializer(data=data, many=True)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        validated_data = serializer.validated_data
+        if isinstance(validated_data, OrderedDict):
+            validated_data = [validated_data]
+
+        for validated_datum in validated_data:
+            user = User.objects.filter(username=validated_datum["user"]).first()
+            if user:
+                if validated_datum["role"] == "admin":
+                    organization.admins.add(user)
+                elif validated_datum["role"] == "member":
+                    organization.members.add(user)
+        return Response({"detail": "Successfully added all valid users"})
+
+    @extend_schema(
+        responses=inline_serializer(
+            name="OrganizationAddUserSerializer",
+            fields={
+                "detail": serializers.CharField(
+                    default="Successfully removed all valid users"
+                )
+            },
+        )
+    )
+    @action(
+        methods=["post"],
+        detail=True,
+        permission_classes=[IsOrganizationAdmin],
+        serializer_class=OrganizationUserSerializer,
+    )
+    def remove_users(self, request, *args, **kwargs):
+        organization = self.get_object()
+        data = request.data
+        if isinstance(data, dict):
+            serializer = self.get_serializer(data=data)
+        else:
+            serializer = self.get_serializer(data=data, many=True)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        validated_data = serializer.validated_data
+        if isinstance(validated_data, OrderedDict):
+            validated_data = [validated_data]
+
+        for validated_datum in validated_data:
+            user = User.objects.filter(username=validated_datum["user"]).first()
+            if user:
+                if validated_datum["role"] == "admin":
+                    organization.admins.remove(user)
+                elif validated_datum["role"] == "member":
+                    organization.members.remove(user)
+        return Response({"detail": "Successfully removed all valid users"})
 
 
 class OrganizationMemberRequestViewSet(
