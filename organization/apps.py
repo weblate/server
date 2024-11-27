@@ -8,4 +8,4 @@ class OrganizationConfig(AppConfig):
     verbose_name = _("organization")
 
     def ready(self):
-        from organization import signals
+        from organization import signals  # noqa: F401

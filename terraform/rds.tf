@@ -75,7 +75,7 @@ resource "aws_db_instance" "postgresql" {
   max_allocated_storage               = 100
   multi_az                            = false
   name                                = var.rds_database_name
-  parameter_group_name                = "default.postgres13"
+  parameter_group_name                = "default.postgres17"
   password                            = local.rds_password
   port                                = var.rds_port
   publicly_accessible                 = false

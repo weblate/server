@@ -7,7 +7,6 @@ from rest_framework.test import APILiveServerTestCase, APITestCase
 
 
 class FullTestCase(APITestCase, APILiveServerTestCase):
-
     fixtures = ["support/content/email.yaml"]
 
     baker = baker
@@ -20,6 +19,9 @@ class FullTestCase(APITestCase, APILiveServerTestCase):
     )
     baker.generators.add(
         "django.contrib.gis.db.models.fields.PointField", random_gen.gen_point
+    )
+    baker.generators.add(
+        "oauth2_provider.models.TokenChecksumField", random_gen.gen_string
     )
 
     status_code = status

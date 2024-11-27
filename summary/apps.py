@@ -8,4 +8,4 @@ class SummaryConfig(AppConfig):
     verbose_name = _("summary")
 
     def ready(self):
-        from summary import signals
+        from summary import signals  # noqa: F401

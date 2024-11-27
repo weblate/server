@@ -65,7 +65,7 @@ resource "aws_elasticache_replication_group" "redis" {
   auto_minor_version_upgrade    = true
   automatic_failover_enabled    = false
   engine                        = "redis"
-  engine_version                = "6.x"
+  engine_version                = "7.x"
   final_snapshot_identifier     = "redis-final-snapshot-${time_static.current.unix}-${local.suffix}"
   maintenance_window            = "Sat:00:00-Sat:02:00"
   multi_az_enabled              = false

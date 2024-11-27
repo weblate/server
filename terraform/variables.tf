@@ -153,7 +153,7 @@ variable "s3_bucket_name" {
 
 variable "eks_cluster_version" {
   type        = string
-  default     = "1.21"
+  default     = "1.31"
   description = "Version of cluster"
 }
 

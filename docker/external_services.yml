@@ -2,30 +2,30 @@ version: "3.7"
 
 services:
   db:
-    container_name: postgis13
-    image: postgis/postgis:13-3.1-alpine
+    container_name: postgis
+    image: postgis/postgis:17-3.5
     env_file: .env
     volumes:
-    - postgis13-data:/var/lib/postgresql/data
+      - postgis-data:/var/lib/postgresql/data
     networks:
-    - external-services
+      - external-services
 
   redis:
-    container_name: redis6
-    image: redis:6-alpine
+    container_name: redis
+    image: redis:6.2-alpine
     env_file: .env
     command: redis-server --requirepass ${REDIS_PASSWORD}
     volumes:
-    - redis6-data:/data
+      - redis-data:/data
     networks:
-    - external-services
+      - external-services
 
 networks:
   external-services:
     external: true
 
 volumes:
-  postgis13-data:
-    name: postgis13-data
-  redis6-data:
-    name: redis6-data
+  postgis-data:
+    name: postgis-data
+  redis-data:
+    name: redis-data

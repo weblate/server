@@ -21,11 +21,11 @@ spec:
         role: backend
     spec:
       containers:
-      - name: container
-        image: ghcr.io/neatplus/server:latest
-        env:
-          - name: CELERY_WORKER
-            value: "true"
-        envFrom:
-          - secretRef:
-              name: server-secret
+        - name: container
+          image: ghcr.io/neatplus/server:latest
+          env:
+            - name: CELERY_WORKER
+              value: "true"
+          envFrom:
+            - secretRef:
+                name: server-secret

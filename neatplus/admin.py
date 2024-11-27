@@ -64,8 +64,8 @@ class ExportCsvMixin:
                 if value is None:
                     value = field_value
                 row_values.append(value)
-            row = writer.writerow(row_values)
+            writer.writerow(row_values)
 
         return response
 
-        export_as_csv.short_description = "Export Selected row"
+    export_as_csv.short_description = "Export Selected row"

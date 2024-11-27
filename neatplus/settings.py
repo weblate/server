@@ -234,8 +234,6 @@ USE_TZ = True
 
 LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
 
-gettext = lambda s: s
-
 LANGUAGES = (
     ("en", _("English")),
     ("es", _("Spanish")),
@@ -381,9 +379,9 @@ SIMPLE_JWT = {
 }
 
 if ENABLE_DEFENDER:
-    SIMPLE_JWT[
-        "TOKEN_OBTAIN_SERIALIZER"
-    ] = "neatplus.serializers.TokenObtainPairDefenderSerializer"
+    SIMPLE_JWT["TOKEN_OBTAIN_SERIALIZER"] = (
+        "neatplus.serializers.TokenObtainPairDefenderSerializer"
+    )
 
 # CORS settings
 CORS_URLS_REGEX = r"^(/api/).*$"

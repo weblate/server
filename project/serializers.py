@@ -2,7 +2,6 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from neatplus.serializers import UserModelSerializer
-from organization.serializers import OrganizationSerializer
 from user.serializers import UserSerializer
 
 from .models import Project, ProjectUser

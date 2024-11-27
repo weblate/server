@@ -8,4 +8,4 @@ class SupportConfig(AppConfig):
     verbose_name = _("support")
 
     def ready(self):
-        from support import signals
+        from support import signals  # noqa: F401

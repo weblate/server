@@ -21,18 +21,17 @@ spec:
         role: dashboard
     spec:
       containers:
-      - name: container
-        image: amancevice/superset:2.0.1
-        ports:
-          - containerPort: 8088
-        envFrom:
-          - secretRef:
-              name: superset-secret
-        volumeMounts:
-          - name: superset-config-volume
-            mountPath: /etc/superset
+        - name: container
+          image: amancevice/superset:2.0.1
+          ports:
+            - containerPort: 8088
+          envFrom:
+            - secretRef:
+                name: superset-secret
+          volumeMounts:
+            - name: superset-config-volume
+              mountPath: /etc/superset
       volumes:
         - name: superset-config-volume
           configMap:
             name: superset-config-map
-

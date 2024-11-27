@@ -1,20 +1,15 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.0.0/deploy/static/provider/aws/deploy.yaml
-  - https://github.com/jetstack/cert-manager/releases/download/v1.5.3/cert-manager.yaml
+  - https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.11.3/deploy/static/provider/aws/deploy.yaml
+  - https://github.com/cert-manager/cert-manager/releases/download/v1.12.14/cert-manager.yaml
   - server.yml
   - celery_worker.yml
   - service.yml
-  - external_dns.yml
 secretGenerator:
   - name: server-secret
     envs:
       - server.env
-    type: Opaque
-  - name: cloudflare-secret
-    envs:
-      - cloudflare.env
     type: Opaque
 replicas:
   - name: server-deployment
@@ -25,15 +20,6 @@ images:
   - name: ghcr.io/neatplus/server
     newTag: ${PROJECT_VERSION}
 patches:
-  - patch: |-
-      apiVersion: v1
-      kind: Secret
-      metadata:
-        name: cloudflare-secret
-        labels:
-          app: cloudflare
-          project: neatplus
-          role: dns
   - patch: |-
       apiVersion: v1
       kind: Secret
