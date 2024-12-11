@@ -23,6 +23,7 @@ spec:
       containers:
         - name: container
           image: ghcr.io/neatplus/server:latest
+          imagePullPolicy: Always
           env:
             - name: CELERY_WORKER
               value: "true"
