@@ -2,7 +2,7 @@
 resource "aws_eip" "nat" {
   for_each = var.eks_public_subnet
 
-  vpc = true
+  domain = "vpc"
 
   tags = {
     "Name" = "${each.key}-${local.suffix}"
