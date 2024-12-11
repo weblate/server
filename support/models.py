@@ -16,7 +16,6 @@ class LegalDocumentTypeChoice(models.TextChoices):
 
 
 class LegalDocument(UserStampedModel, TimeStampedModel):
-
     document_type = models.CharField(
         _("document type"),
         max_length=20,

@@ -12,7 +12,7 @@ class UserStampedBaker(Baker):
         _save_kwargs,
         _refresh_after_create,
         _from_manager,
-        **attrs
+        **attrs,
     ):
         self.passed_attrs = dict(attrs)
         return super()._make(
@@ -21,7 +21,7 @@ class UserStampedBaker(Baker):
             _save_kwargs=_save_kwargs,
             _refresh_after_create=_refresh_after_create,
             _from_manager=_from_manager,
-            **attrs
+            **attrs,
         )
 
     def instance(self, attrs, _commit, _save_kwargs, _from_manager):

@@ -3,57 +3,79 @@
 # See https://docs.docker.com/develop/develop-images/multistage-build/
 
 # Creating a python base with shared environment variables
-FROM python:3.11-bullseye as python-base
+FROM python:3.13-bookworm AS python-base
+
+RUN  apt-get update \
+    && apt-get install --no-install-recommends -y\
+    libsqlite3-mod-spatialite \
+    binutils \
+    libproj-dev \
+    gdal-bin
 
 # non interactive frontend
 ENV DEBIAN_FRONTEND=noninteractive
 
-# install requiremnts for python install
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y \
-    software-properties-common \
-    git \
-    curl \
-    build-essential \
-    libsqlite3-mod-spatialite \
-    gdal-bin
-
-ENV POETRY_VERSION=1.3.1 \
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=off \
+    PIP_DISABLE_PIP_VERSION_CHECK=on \
+    PIP_DEFAULT_TIMEOUT=100 \
+    POETRY_VERSION=1.8.4 \
     POETRY_HOME="/opt/poetry" \
     POETRY_VIRTUALENVS_IN_PROJECT=true \
-    POETRY_NO_INTERACTION=1
+    POETRY_NO_INTERACTION=1 \
+    PYSETUP_PATH="/opt/pysetup" \
+    CODE_PATH="/code"
 
 # add poetry home to path
-ENV PATH="$POETRY_HOME/bin:$PATH"
+ENV PATH="$POETRY_HOME/bin:$PYSETUP_PATH/.venv/bin/:$PATH"
 
-# install virtualenv
-RUN pip install -U virtualenv
+FROM python-base AS builder-base
 
-# Install Poetry - respects $POETRY_VERSION & $POETRY_HOME
+RUN apt-get install --no-install-recommends -y \
+    software-properties-common \
+    curl \
+    build-essential
+
 RUN curl -sSL https://install.python-poetry.org | python
 
-# testing stage
-FROM python-base as testing
+WORKDIR $PYSETUP_PATH
+COPY poetry.lock pyproject.toml ./
 
-WORKDIR /code
+RUN poetry install --no-dev
+
+# testing stage
+FROM python-base AS testing
+
+COPY --from=builder-base $POETRY_HOME $POETRY_HOME
+COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+
+WORKDIR $CODE_PATH
 
 ENTRYPOINT ["/code/docker/entrypoint.test.sh"]
 
 # development stage
-FROM python-base as development
+FROM python-base AS development
 
-WORKDIR /code
+COPY --from=builder-base $POETRY_HOME $POETRY_HOME
+COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+
+WORKDIR $CODE_PATH
 
 ENTRYPOINT ["/code/docker/entrypoint.dev.sh"]
 
 # production stage
-FROM python-base as production
+FROM builder-base AS production-build
 
-WORKDIR /code
+RUN poetry install --no-root --no-dev --extras asgi
 
-COPY . /code/
+# production stage
+FROM python-base AS production
 
-# install all dependencies
-RUN poetry install --no-dev --extras asgi
+COPY --from=production-build $PYSETUP_PATH $PYSETUP_PATH
+
+WORKDIR $CODE_PATH
+
+COPY . $CODE_PATH
 
 ENTRYPOINT [ "/code/docker/entrypoint.prod.sh"]

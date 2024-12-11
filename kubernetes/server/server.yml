@@ -21,10 +21,10 @@ spec:
         role: backend
     spec:
       containers:
-      - name: container
-        image: ghcr.io/neatplus/server:latest
-        ports:
-          - containerPort: 8000
-        envFrom:
-          - secretRef:
-              name: server-secret
+        - name: container
+          image: ghcr.io/neatplus/server:latest
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: server-secret

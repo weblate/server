@@ -13,7 +13,6 @@ class TabChoice(TextChoices):
 
 
 class ProjectFilter(FilterSet):
-
     tab = ChoiceFilter(label="tab", method="get_tab", choices=TabChoice.choices)
 
     class Meta:

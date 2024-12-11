@@ -1,6 +1,4 @@
 from ckeditor_uploader.fields import RichTextUploadingField
-from defender import config as defender_config
-from defender import utils as defender_utils
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
@@ -64,14 +62,17 @@ class RichTextUploadingSerializerField(CharField):
 
 class RichTextUploadingModelSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
-        self.serializer_field_mapping[
-            RichTextUploadingField
-        ] = RichTextUploadingSerializerField
+        self.serializer_field_mapping[RichTextUploadingField] = (
+            RichTextUploadingSerializerField
+        )
         super().__init__(*args, **kwargs)
 
 
 class TokenObtainPairDefenderSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
+        from defender import config as defender_config
+        from defender import utils as defender_utils
+
         login_unsuccessful = False
         login_exception = None
         request_username = attrs[self.username_field]

@@ -8,4 +8,4 @@ class ProjectConfig(AppConfig):
     verbose_name = _("project")
 
     def ready(self):
-        from project import signals
+        from project import signals  # noqa: F401

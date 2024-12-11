@@ -7,7 +7,7 @@ metadata:
 spec:
   secretName: superset-cert-secret
   dnsNames:
-  - example.com
+    - example.com
   issuerRef:
     name: letsencrypt-issuer
     kind: ClusterIssuer

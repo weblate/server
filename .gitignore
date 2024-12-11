@@ -32,3 +32,5 @@ kubernetes/**/kustomization.yaml
 
 # Mac related
 .DS_Store
+
+control/

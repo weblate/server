@@ -1,10 +1,5 @@
-from base64 import b32encode
-
-import qrcode
 import yaml
-from django.contrib.auth import get_user_model
-from django.core.management.base import BaseCommand, CommandError
-from django_otp.plugins.otp_totp.models import TOTPDevice
+from django.core.management.base import BaseCommand
 
 from support.models import EmailTemplate
 

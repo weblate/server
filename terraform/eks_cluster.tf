@@ -33,7 +33,6 @@ resource "aws_iam_role_policy_attachment" "eks-AmazonEKSServicePolicy" {
   role       = aws_iam_role.eks.name
 }
 
-
 # IAM role atatchment for VPC pod security group
 resource "aws_iam_role_policy_attachment" "eks-AmazonEKSVPCResourceController" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
@@ -93,4 +92,20 @@ resource "aws_eks_cluster" "eks" {
   tags = {
     "Name" = local.cluster_name
   }
+}
+
+# EKS addon
+resource "aws_eks_addon" "vpc-cni" {
+  cluster_name = aws_eks_cluster.eks.name
+  addon_name   = "vpc-cni"
+}
+
+resource "aws_eks_addon" "kube-proxy" {
+  cluster_name = aws_eks_cluster.eks.name
+  addon_name   = "kube-proxy"
+}
+
+resource "aws_eks_addon" "coredns" {
+  cluster_name = aws_eks_cluster.eks.name
+  addon_name   = "coredns"
 }

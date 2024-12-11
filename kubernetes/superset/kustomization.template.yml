@@ -23,11 +23,11 @@ patches:
           project: neatplus
           role: dashboard
   - patch: |-
-        apiVersion: v1
-        kind: ConfigMap
-        metadata:
-          name: superset-config-map
-          labels:
-            app: superset
-            project: neatplus
-            role: dashboard
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: superset-config-map
+        labels:
+          app: superset
+          project: neatplus
+          role: dashboard

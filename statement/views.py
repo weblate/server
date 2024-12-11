@@ -164,8 +164,7 @@ class StatementViewSet(
                             version="draft",
                             created_by=user,
                         )
-        except Exception as e:
-            print(e)
+        except Exception:
             return Response(
                 {"error": _("Failed to upload weightage for statement")},
                 status=status.HTTP_400_BAD_REQUEST,

@@ -72,10 +72,9 @@ class SurveyResultViewSet(
                         survey_result=survey_result,
                         actual_score=survey_result_score,
                         is_baseline=False,
-                        **data
+                        **data,
                     )
-        except Exception as e:
-            print(e)
+        except Exception:
             return Response(
                 {"detail": _("Failed to add survey result feedback")},
                 status=status.HTTP_400_BAD_REQUEST,

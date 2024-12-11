@@ -34,17 +34,17 @@ def send_new_project_notification_to_admin(sender, instance, created, **kwargs):
 def send_project_acceptance_change_mail(sender, instance, created, **kwargs):
     update_fields = kwargs.get("update_fields")
     if update_fields and "status" in update_fields:
+        context = {"project": instance}
         if instance.status == "accepted":
             subject, html_message, text_message = EmailTemplate.objects.get(
                 identifier="accept_project"
-            ).get_email_contents({"project": instance})
+            ).get_email_contents(context)
         elif instance.status == "rejected":
             subject, html_message, text_message = EmailTemplate.objects.get(
                 identifier="reject_project"
-            ).get_email_contents({"project": instance})
+            ).get_email_contents(context)
         else:
             return
-        context = {"project": instance}
         instance.created_by.email_user(subject, text_message, html_message=html_message)
         instance.created_by.notify(
             instance.updated_by,

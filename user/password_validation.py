@@ -1,8 +1,7 @@
 import string
 
 from django.contrib.auth.hashers import check_password, make_password
-from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
 from django.utils.translation import ngettext_lazy
 
 from .models import UserOldPassword

@@ -9,8 +9,9 @@ from neatplus.models import TimeStampedModel, UserStampedModel
 class Project(TimeStampedModel, UserStampedModel, OrderedModel):
     class VisibilityChoice(models.TextChoices):
         PUBLIC = "public", _("Public")
-        PUBLIC_WITHIN_ORGANIZATION = "public_within_organization", _(
-            "Public Within Organization"
+        PUBLIC_WITHIN_ORGANIZATION = (
+            "public_within_organization",
+            _("Public Within Organization"),
         )
         PRIVATE = "private", _("Private")
 

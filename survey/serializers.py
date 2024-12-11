@@ -1,6 +1,5 @@
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.files.storage import default_storage
-from django.forms import ValidationError
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.fields import ImageField

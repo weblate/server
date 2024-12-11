@@ -11,6 +11,6 @@ spec:
     privateKeySecretRef:
       name: issuer-private-key
     solvers:
-    - http01:
-        ingress:
-          class: nginx
+      - http01:
+          ingress:
+            class: nginx

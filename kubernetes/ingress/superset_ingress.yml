@@ -9,17 +9,17 @@ metadata:
     certmanager.k8s.io/cluster-issuer: letsencrypt-issuer
 spec:
   tls:
-  - hosts:
-    - example.com
-    secretName: superset-cert-secret
+    - hosts:
+        - example.com
+      secretName: superset-cert-secret
   rules:
-  - host: example.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: superset-clusterip-service
-            port:
-              name: http
+    - host: example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: superset-clusterip-service
+                port:
+                  name: http
