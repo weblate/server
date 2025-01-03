@@ -25,6 +25,9 @@ class Module(CodeModel, UserStampedModel, TimeStampedModel, OrderedModel):
         related_name="modules",
         verbose_name=_("context"),
     )
+    question_completion_time = models.DurationField(
+        _("estimated time to complete question"), null=True, blank=True, default=None
+    )
 
     def __str__(self):
         return self.code + "-" + self.title
