@@ -1,4 +1,4 @@
 #!/bin/sh
-poetry install --no-root
-poetry run python ./manage.py collectstatic --no-input
-poetry run python ./manage.py test -v 3
+uv sync --frozen --no-dev --group test
+uv run manage.py collectstatic --no-input
+uv run manage.py test -v 3
