@@ -3,7 +3,7 @@
 # See https://docs.docker.com/develop/develop-images/multistage-build/
 
 #  Creating a python base with shared dependencies
-FROM python:3.13-bookworm AS python-base
+FROM python:3.13-slim-bookworm AS python-base
 
 # non interactive frontend
 ENV DEBIAN_FRONTEND=noninteractive
@@ -18,59 +18,49 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 
 
 ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
     CODE_PATH="/code" \
-    VENV_PATH="/code/.venv"
+    VENV_PATH="/code/.venv" \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
 
-FROM python-base AS builder
+# stage for uv    
+FROM python-base AS uv-base
+# uv binary form official image
+COPY --from=ghcr.io/astral-sh/uv:0.5 /uv /uvx /bin/
 
-# Install curl and uv
-RUN apt-get install -y curl && \
-    curl --proto '=https' --tlsv1.2 -LsSf https://github.com/astral-sh/uv/releases/download/0.5.15/uv-installer.sh | sh && \
-    ln -s /root/.local/bin/uv /usr/local/bin/uv && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
-WORKDIR $CODE_PATH
-
-COPY pyproject.toml uv.lock ./
-
-# Install core dependencies
-RUN uv sync --frozen --no-dev
 
 # Development stage
-FROM python-base AS development
+FROM uv-base AS development
 
 WORKDIR $CODE_PATH
 
-# Copy dependencies and source code
-COPY --from=builder /usr/local/bin/uv /usr/local/bin/uv
-COPY --from=builder $VENV_PATH $VENV_PATH
+# Copy source code
 COPY . $CODE_PATH
 
 # Use development entrypoint
 ENTRYPOINT ["/code/docker/entrypoint.dev.sh"]
 
 # Testing stage
-FROM python-base AS testing
+FROM uv-base AS testing
 
 WORKDIR $CODE_PATH
 
-# Copy dependencies and source code
-COPY --from=builder /usr/local/bin/uv /usr/local/bin/uv
-COPY --from=builder $VENV_PATH $VENV_PATH
+# Copy source code
 COPY . $CODE_PATH
 
 # Use testing entrypoint
 ENTRYPOINT ["/code/docker/entrypoint.test.sh"]
 
 # Production build stage
-FROM builder AS production-build
+FROM uv-base AS production-build
 
 WORKDIR $CODE_PATH
 
-RUN uv sync --frozen --no-dev --extra production
+COPY pyproject.toml uv.lock ./
 
-
+# Install all dependencies required for production
+RUN uv venv --seed
+RUN uv sync --frozen --no-dev --extra production --no-install-project
 
 # Production stage
 FROM python-base AS production
