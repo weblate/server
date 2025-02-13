@@ -1,0 +1,9 @@
+.git/
+.venv/
+.github/
+.ruff_cache/
+.gitignore
+**/__pycache__/
+.example.env
+README.MD
+COPYING
